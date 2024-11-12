@@ -10,10 +10,20 @@ const CHAR_SETS = {
 document.addEventListener("DOMContentLoaded", function () {
     const currentYear = new Date().getFullYear();
     document.getElementById('currentYear').textContent = currentYear;
+
+    // Automatically generate the password when the page loads
+    generateAndDisplayPassword();
 });
 
-// Event listener to handle password generation
-document.getElementById('generate').addEventListener('click', function () {
+// Event listeners to handle password generation whenever options change
+document.getElementById('length').addEventListener('input', generateAndDisplayPassword);
+document.getElementById('includeLowercase').addEventListener('change', generateAndDisplayPassword);
+document.getElementById('includeUppercase').addEventListener('change', generateAndDisplayPassword);
+document.getElementById('includeNumbers').addEventListener('change', generateAndDisplayPassword);
+document.getElementById('includeSymbols').addEventListener('change', generateAndDisplayPassword);
+
+// Generate and display password based on selected options
+function generateAndDisplayPassword() {
     const length = getPasswordLength();
     const options = getPasswordOptions();
 
@@ -26,7 +36,7 @@ document.getElementById('generate').addEventListener('click', function () {
     displayPassword(password);
     updatePasswordStrength(password);
     calculateEntropy(password, options);
-});
+}
 
 // Get password length
 function getPasswordLength() {
@@ -120,7 +130,6 @@ function calculatePasswordStrength(password) {
     return strength;
 }
 
-
 // Calculate and update password entropy (in bits)
 function calculateEntropy(password, options) {
     const characters = buildCharacterSet(options);
@@ -131,34 +140,12 @@ function calculateEntropy(password, options) {
     updateEntropyUI(entropy);
 }
 
-// Update the entropy progress bar and display value in the UI
+// Update the entropy display in bits (no progress bar, just text)
 function updateEntropyUI(entropy) {
-    const maxLowEntropy = 64;  // Maximum entropy (bits) for the lower scale
-    const maxHighEntropy = 192; // Maximum entropy (bits) for the higher scale
-    const lowEntropyThresholdPercent = 40; // Percentage threshold for $maxLowEntropy
-    const highEntropyScaleFactor = 100 - lowEntropyThresholdPercent; // Scale factor from $maxLowEntropy to $maxHighEntropy range
-
-    let entropyPercentage = 0;
-
-    // Adjust entropy scale for a 128-bit password (70%) to 256-bit (100%)
-    if (entropy <= maxLowEntropy) {
-        entropyPercentage = (entropy / maxLowEntropy) * lowEntropyThresholdPercent;
-    } else if (entropy <= maxHighEntropy) {
-        entropyPercentage = lowEntropyThresholdPercent + ((entropy - maxLowEntropy) / (maxHighEntropy - maxLowEntropy)) * highEntropyScaleFactor;
-    } else {
-        // Cap the entropy at 100% if it exceeds 256 bits
-        entropyPercentage = 100;
-    }
-
-    // Update the entropy progress bar and text
-    const entropyProgressBar = document.getElementById('entropy');
+    // Display entropy in bits
     const entropyValueDisplay = document.getElementById('entropyValue');
-
-    entropyProgressBar.value = entropyPercentage;
     entropyValueDisplay.textContent = `${Math.round(entropy)} bits`;
 }
-
-
 
 // Copy the generated password to the clipboard
 document.getElementById('copy').addEventListener('click', function () {
