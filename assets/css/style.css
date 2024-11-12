@@ -112,11 +112,30 @@ input[type="checkbox"] {
     height: 20px;
     margin-top: 10px;
     border-radius: 5px;
+    transition: background-color 0.5s ease-in-out; /* Smooth transition */
+}
+
+.strength-weak {
+    background-color: #ff4d4d; /* Red */
+}
+
+.strength-medium {
+    background-color: #ffcc00; /* Yellow */
+}
+
+.strength-strong {
+    background-color: #4caf50; /* Green */
 }
 
 #entropyValue {
     margin-top: 5px;
     font-weight: bold;
+}
+
+/* Password Entropy Bar */
+#entropy {
+    background-color: #ddd;
+    background: linear-gradient(to right, #4caf50, #ffcc00, #ff4d4d); /* Green to Yellow to Red */
 }
 
 /* Footer */
