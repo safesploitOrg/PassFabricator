@@ -22,21 +22,34 @@ document.getElementById('includeUppercase').addEventListener('change', generateA
 document.getElementById('includeNumbers').addEventListener('change', generateAndDisplayPassword);
 document.getElementById('includeSymbols').addEventListener('change', generateAndDisplayPassword);
 
-// Generate and display password based on selected options
 function generateAndDisplayPassword() {
+    // Local variables
+    const passwordField = document.getElementById('password');
+    const spinner = document.getElementById('loading-spinner');
     const length = getPasswordLength();
     const options = getPasswordOptions();
+    const delayTime = 300; // Set delay time in milliseconds
 
-    if (!validatePasswordOptions(options)) {
-        alert("You must select at least one character type!");
-        return;
-    }
+    // Show loading spinner
+    spinner.style.display = 'inline-block';
 
-    const password = generatePassword(length, options);
-    displayPassword(password);
-    updatePasswordStrength(password);
-    calculateEntropy(password, options);
+    // Simulate a short delay for password regeneration
+    setTimeout(function () {
+        if (!validatePasswordOptions(options)) {
+            alert("You must select at least one character type!");
+            return;
+        }
+
+        const password = generatePassword(length, options);
+        displayPassword(password);
+        updatePasswordStrength(password);
+        calculateEntropy(password, options);
+        
+        // Hide loading spinner after password generation
+        spinner.style.display = 'none';
+    }, delayTime); // Use variable for delay time
 }
+
 
 // Get password length
 function getPasswordLength() {
@@ -142,9 +155,20 @@ function calculateEntropy(password, options) {
 
 // Update the entropy display in bits (no progress bar, just text)
 function updateEntropyUI(entropy) {
-    // Display entropy in bits
     const entropyValueDisplay = document.getElementById('entropyValue');
     entropyValueDisplay.textContent = `${Math.round(entropy)} bits`;
+}
+
+// Show the loading spinner
+function showLoadingSpinner() {
+    const spinner = document.getElementById('loading-spinner');
+    spinner.style.display = 'inline-block';
+}
+
+// Hide the loading spinner
+function hideLoadingSpinner() {
+    const spinner = document.getElementById('loading-spinner');
+    spinner.style.display = 'none';
 }
 
 // Copy the generated password to the clipboard
@@ -158,4 +182,12 @@ document.getElementById('copy').addEventListener('click', function () {
     } else {
         alert("Generate a password first!");
     }
+});
+
+// Toggle show/hide password functionality
+document.getElementById('togglePassword').addEventListener('click', function () {
+    const passwordField = document.getElementById('password');
+    const type = passwordField.type === 'password' ? 'text' : 'password';
+    passwordField.type = type;
+    this.textContent = type === 'password' ? 'Show' : 'Hide';
 });

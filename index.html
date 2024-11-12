@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="assets/favicon/password-100.png" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Generator</title>
+    <title>PassFabricator</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -15,13 +16,18 @@
         <section class="container">
             <!-- Password Output Section -->
             <div class="password-container">
-                <input type="text" id="password" class="password" readonly aria-labelledby="password-output">
+                <input type="password" id="password" class="password" readonly aria-labelledby="password-output" />
+            </div>
+
+            <!-- Buttons below the password -->
+            <div class="password-buttons">
                 <button id="copy" class="copy-btn" aria-label="Copy password to clipboard">Copy</button>
+                <button id="togglePassword" class="toggle-btn">Show</button>
             </div>
 
             <!-- Password Options -->
             <section class="options">
-                <label for="length">Password Length:</label>
+                <label for="length">Password Length</label>
                 <input type="number" id="length" value="12" min="1" max="128" aria-label="Set password length" />
 
                 <fieldset>
@@ -45,15 +51,20 @@
                 </fieldset>
             </section>
 
-            <!-- Password Strength -->
+            <!-- Loading Spinner Container -->
+            <div id="loading-container" class="loading-container">
+                <div id="loading-spinner" class="loading-spinner"></div>
+            </div>
+
+            <!-- Password Strength and Entropy -->
             <section class="strength-entropy">
                 <div class="strength-meter">
-                    <label for="strength">Password Strength:</label>
+                    <label for="strength">Password Strength</label>
                     <progress id="strength" value="0" max="100"></progress>
                 </div>
                 <!-- Entropy display (in bits) -->
                 <div class="entropy-container">
-                    <label for="entropy">Password Entropy (in bits):</label>
+                    <label for="entropy">Entropy</label>
                     <span id="entropyValue">0 bits</span>
                 </div>
             </section>

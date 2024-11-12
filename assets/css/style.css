@@ -6,31 +6,42 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f6f8fa;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     flex-direction: column;
+    overflow: auto;  /* Ensures that body can scroll if content overflows */
 }
 
 h1 {
     margin-bottom: 20px;
     color: #333;
-    font-size: 2rem;
+    font-size: 2.5rem;
+    font-weight: 600;
     text-align: center;
+    letter-spacing: 1px;
 }
 
 .container {
     text-align: center;
     background-color: white;
     padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
+    transition: transform 0.3s ease-in-out;
+    overflow: hidden;  /* Prevents overflow inside the container */
+    box-sizing: border-box;
 }
+
+/* Hover effect on main container */
+/* .container:hover {
+    transform: scale(1.02); /* Slight zoom effect */
+} */
 
 .password-container {
     display: flex;
@@ -41,42 +52,114 @@ h1 {
 
 .password {
     width: 70%;
-    padding: 10px;
-    font-size: 18px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    padding: 12px;
+    font-size: 1.2rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
     margin-right: 10px;
     text-align: center;
+    outline: none;
+    transition: border 0.3s ease;
 }
 
-.generate-btn,
+.password:focus {
+    border: 2px solid #4caf50;
+}
+
+/* Password Buttons */
+.password-buttons {
+    margin-top: 15px;
+}
+
 .copy-btn {
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 12px 20px;
+    font-size: 1rem;
     border: none;
-    background-color: #007bff;
+    background-color: #4caf50;
     color: white;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+    margin-left: 10px;
 }
 
-.generate-btn:hover,
 .copy-btn:hover {
-    background-color: #0056b3;
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+.copy-btn:active {
+    transform: translateY(2px);
+}
+
+/* Show/Hide Password Button Styles */
+.toggle-btn {
+    padding: 12px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+    margin-left: 10px;
+}
+
+.show-btn {
+    background-color: #f44336; /* Red */
+    color: white;
+}
+
+.show-btn:hover {
+    background-color: #d32f2f;
+}
+
+.hide-btn {
+    background-color: #2196f3; /* Blue */
+    color: white;
+}
+
+.hide-btn:hover {
+    background-color: #1976d2;
+}
+
+/* Loading Spinner Container */
+#loading-container {
+    position: relative;
+    height: 40px; /* Same height as password field */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px; /* Prevents layout shifting when spinner appears */
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+    display: none; /* Hidden initially */
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* Password Options */
 .options {
     margin-top: 20px;
     text-align: left;
+    width: 100%;
 }
 
 fieldset {
-    border: 1px solid #ccc;
-    padding: 15px;
-    border-radius: 5px;
-    margin-top: 15px;
+    border: none;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
 }
 
 legend {
@@ -86,33 +169,33 @@ legend {
 
 label {
     margin-left: 5px;
-    font-size: 14px;
+    font-size: 1rem;
 }
 
 input[type="number"] {
-    width: 50px;
+    width: 60px;
     padding: 5px;
     margin: 5px;
-    font-size: 14px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
 }
 
 input[type="checkbox"] {
     margin: 10px 5px 10px 0;
 }
 
-/* Strength and Entropy */
-.strength-entropy {
+/* Password Strength */
+.strength-meter {
     margin-top: 20px;
-    text-align: left;
 }
 
-#strength,
-#entropy {
+#strength {
     width: 100%;
-    height: 20px;
+    height: 10px;
     margin-top: 10px;
     border-radius: 5px;
-    transition: background-color 0.5s ease-in-out; /* Smooth transition */
+    transition: background-color 0.1s ease-in-out;
 }
 
 .strength-weak {
@@ -127,28 +210,29 @@ input[type="checkbox"] {
     background-color: #4caf50; /* Green */
 }
 
-#entropyValue {
-    margin-top: 5px;
+/* Entropy Display */
+.entropy-container {
+    margin-top: 20px;
     font-weight: bold;
 }
 
-/* Password Entropy Bar */
-#entropy {
-    background-color: #ddd;
-    background: linear-gradient(to right, #4caf50, #ffcc00, #ff4d4d); /* Green to Yellow to Red */
+#entropyValue {
+    font-size: 1.2rem;
+    color: #555;
 }
 
 /* Footer */
 footer {
     text-align: center;
     margin-top: 30px;
-    font-size: 14px;
+    font-size: 1rem;
+    color: #888;
 }
 
 footer a {
     text-decoration: none;
     color: #007bff;
-    font-weight: bold;
+    font-weight: 500;
 }
 
 footer a:hover {
@@ -158,8 +242,9 @@ footer a:hover {
 /* Responsive Design */
 @media (max-width: 600px) {
     .container {
-        padding: 15px;
+        padding: 20px;
         width: 90%;
+        overflow-y: auto; /* Allow vertical scrolling if content overflows */
     }
 
     .password-container input,
@@ -168,13 +253,20 @@ footer a:hover {
         margin-top: 10px;
     }
 
-    .generate-btn,
-    .copy-btn {
+    .copy-btn,
+    .toggle-btn {
         padding: 12px;
-        font-size: 18px;
+        font-size: 1.1rem;
+        width: 100%;
+        margin-top: 10px;
     }
 
     .options input[type="number"] {
-        width: 60px;
+        width: 100%; /* Ensure input field is responsive */
+        margin-top: 10px;
+    }
+
+    footer {
+        font-size: 0.9rem;
     }
 }
