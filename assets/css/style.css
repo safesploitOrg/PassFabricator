@@ -1,0 +1,161 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 2rem;
+    text-align: center;
+}
+
+.container {
+    text-align: center;
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+.password-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.password {
+    width: 70%;
+    padding: 10px;
+    font-size: 18px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-right: 10px;
+    text-align: center;
+}
+
+.generate-btn,
+.copy-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.generate-btn:hover,
+.copy-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Password Options */
+.options {
+    margin-top: 20px;
+    text-align: left;
+}
+
+fieldset {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+legend {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+label {
+    margin-left: 5px;
+    font-size: 14px;
+}
+
+input[type="number"] {
+    width: 50px;
+    padding: 5px;
+    margin: 5px;
+    font-size: 14px;
+}
+
+input[type="checkbox"] {
+    margin: 10px 5px 10px 0;
+}
+
+/* Strength and Entropy */
+.strength-entropy {
+    margin-top: 20px;
+    text-align: left;
+}
+
+#strength,
+#entropy {
+    width: 100%;
+    height: 20px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+#entropyValue {
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 14px;
+}
+
+footer a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .container {
+        padding: 15px;
+        width: 90%;
+    }
+
+    .password-container input,
+    .password-container button {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .generate-btn,
+    .copy-btn {
+        padding: 12px;
+        font-size: 18px;
+    }
+
+    .options input[type="number"] {
+        width: 60px;
+    }
+}
