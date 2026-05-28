@@ -37,6 +37,20 @@ import {
   bindChangeEvent
 } from './modules/ui.js';
 
+const DEFAULT_APP_MODE = 'generate';
+
+const HASH_TO_MODE = {
+  '#generate': 'generate',
+  '#analyse': 'analyse',
+  '#analyze': 'analyse',
+  '#analyise': 'analyse'
+};
+
+const MODE_TO_HASH = {
+  generate: '#generate',
+  analyse: '#analyse'
+};
+
 const CHECKBOX_IDS = [
   'includeLowercase',
   'includeUppercase',
@@ -61,8 +75,15 @@ function initialiseApp() {
   bindAnalyserEvents();
   bindModeEvents();
 
-  setAppMode('generate');
-  generateAndDisplayPassword();
+  const initialMode = getModeFromHash();
+
+  setAppMode(initialMode);
+
+  if (initialMode === 'generate') {
+    generateAndDisplayPassword();
+  } else {
+    analyseProvidedPassword();
+  }
 }
 
 function bindGeneratorEvents() {
@@ -102,14 +123,18 @@ function bindAnalyserEvents() {
 
 function bindModeEvents() {
   bindClickEvent('generateModeButton', () => {
+    updateHashForMode('generate');
     setAppMode('generate');
     generateAndDisplayPassword();
   });
 
   bindClickEvent('analyseModeButton', () => {
+    updateHashForMode('analyse');
     setAppMode('analyse');
     analyseProvidedPassword();
   });
+
+  window.addEventListener('hashchange', handleHashChange);
 }
 
 function persistCurrentGeneratorPreferences() {
@@ -138,12 +163,13 @@ function generateAndDisplayPassword() {
 
       const password = generatePassword(length, options);
       const entropyBits = calculateGeneratedPasswordEntropy(password, options);
+      const analysis = analysePassword(password);
 
       displayGeneratedPassword(password);
 
       updateMetricsDisplay({
         password,
-        strengthScore: analysePassword(password).strengthScore,
+        strengthScore: analysis.strengthScore,
         entropyBits,
         entropyLabel: 'Entropy'
       });
@@ -167,4 +193,30 @@ function analyseProvidedPassword() {
   });
 
   updateFeedbackDisplay(analysis.feedback);
+}
+
+function getModeFromHash() {
+  const hash = window.location.hash.toLowerCase();
+
+  return HASH_TO_MODE[hash] ?? DEFAULT_APP_MODE;
+}
+
+function updateHashForMode(mode) {
+  const targetHash = MODE_TO_HASH[mode] ?? MODE_TO_HASH[DEFAULT_APP_MODE];
+
+  if (window.location.hash !== targetHash) {
+    window.history.replaceState(null, '', targetHash);
+  }
+}
+
+function handleHashChange() {
+  const mode = getModeFromHash();
+
+  setAppMode(mode);
+
+  if (mode === 'generate') {
+    generateAndDisplayPassword();
+  } else {
+    analyseProvidedPassword();
+  }
 }
