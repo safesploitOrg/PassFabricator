@@ -172,6 +172,11 @@ h1 {
   display: none;
 }
 
+.tool-grid {
+  display: grid;
+  gap: 1rem;
+}
+
 .password-panel,
 .options,
 .strength-entropy {
@@ -423,6 +428,26 @@ input[type="number"] {
   line-height: 1.5;
 }
 
+.analysis-info-card {
+  padding: 1rem;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.analysis-info-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.analysis-info-card p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
 .loading-container {
   display: flex;
   justify-content: center;
@@ -582,6 +607,123 @@ footer a {
 
 footer a:hover {
   text-decoration: underline;
+}
+
+@media (min-width: 960px) {
+  :root {
+    --content-width: 1120px;
+  }
+
+  body {
+    padding: 1.25rem;
+  }
+
+  .app-shell {
+    margin: 0 auto;
+  }
+
+  .hero {
+    margin-bottom: 1rem;
+  }
+
+  .eyebrow {
+    margin-bottom: 0.35rem;
+    font-size: 0.76rem;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 4.2vw, 3.75rem);
+  }
+
+  .hero-copy {
+    max-width: 46rem;
+    margin-top: 0.6rem;
+    font-size: 1rem;
+    line-height: 1.45;
+  }
+
+  .card {
+    padding: 1.4rem;
+  }
+
+  .mode-switcher {
+    max-width: 28rem;
+    margin: 0 auto 1rem;
+  }
+
+  .section-heading {
+    margin-bottom: 0.75rem;
+  }
+
+  .section-heading h2 {
+    font-size: 1.35rem;
+  }
+
+  .section-heading h3 {
+    font-size: 1.05rem;
+  }
+
+  .section-heading p {
+    font-size: 0.9rem;
+  }
+
+  .tool-grid {
+    grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+    align-items: start;
+    gap: 1rem;
+  }
+
+  .password-panel,
+  .options,
+  .analysis-info-card {
+    min-height: 100%;
+  }
+
+  .options {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .password {
+    min-height: 3.65rem;
+  }
+
+  .password-buttons {
+    margin-top: 0.7rem;
+  }
+
+  .length-control {
+    padding: 0.85rem;
+  }
+
+  .check-card {
+    min-height: 3.85rem;
+    padding: 0.8rem;
+  }
+
+  .loading-container {
+    min-height: 1.4rem;
+    margin: 0.45rem 0;
+  }
+
+  .strength-entropy {
+    grid-template-columns: 1.5fr 1fr;
+    gap: 1rem;
+  }
+
+  .metric-card {
+    min-height: 4.5rem;
+    padding: 0.9rem 1rem;
+  }
+
+  .feedback-card {
+    margin-top: 1rem;
+  }
+
+  footer {
+    margin-top: 0.85rem;
+  }
 }
 
 @media (max-width: 680px) {

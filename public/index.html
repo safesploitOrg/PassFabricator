@@ -52,91 +52,93 @@
           </div>
         </div>
 
-        <section class="password-panel" aria-label="Generated password">
-          <label class="section-label" for="password">Generated password</label>
+        <div class="tool-grid generate-grid">
+          <section class="password-panel" aria-label="Generated password">
+            <label class="section-label" for="password">Generated password</label>
 
-          <div class="password-output">
-            <input
-              type="password"
-              id="password"
-              class="password"
-              readonly
-              aria-label="Generated password"
-              spellcheck="false"
-              autocomplete="off"
-            >
-          </div>
-
-          <div class="password-buttons" aria-label="Generated password actions">
-            <button id="copy" class="btn btn-primary" type="button" aria-label="Copy password to clipboard">
-              Copy
-            </button>
-
-            <button id="togglePassword" class="btn btn-secondary" type="button">
-              Show
-            </button>
-          </div>
-        </section>
-
-        <section class="options" aria-labelledby="options-title">
-          <div class="section-heading compact">
-            <div>
-              <h3 id="options-title">Options</h3>
-              <!-- <p>Saved locally for 60 days. Passwords are never saved.</p> -->
+            <div class="password-output">
+              <input
+                type="password"
+                id="password"
+                class="password"
+                readonly
+                aria-label="Generated password"
+                spellcheck="false"
+                autocomplete="off"
+              >
             </div>
-          </div>
 
-          <div class="length-control">
-            <label for="length">Password length</label>
-            <input
-              type="number"
-              id="length"
-              value="20"
-              min="1"
-              max="128"
-              inputmode="numeric"
-              aria-label="Set password length"
-            >
-          </div>
+            <div class="password-buttons" aria-label="Generated password actions">
+              <button id="copy" class="btn btn-primary" type="button" aria-label="Copy password to clipboard">
+                Copy
+              </button>
 
-          <fieldset class="character-options">
-            <legend>Character types</legend>
-
-            <div class="option-grid">
-              <label class="check-card" for="includeLowercase">
-                <input type="checkbox" id="includeLowercase" checked>
-                <span>
-                  <strong>Lowercase</strong>
-                  <small>a-z</small>
-                </span>
-              </label>
-
-              <label class="check-card" for="includeUppercase">
-                <input type="checkbox" id="includeUppercase" checked>
-                <span>
-                  <strong>Uppercase</strong>
-                  <small>A-Z</small>
-                </span>
-              </label>
-
-              <label class="check-card" for="includeNumbers">
-                <input type="checkbox" id="includeNumbers" checked>
-                <span>
-                  <strong>Numbers</strong>
-                  <small>0-9</small>
-                </span>
-              </label>
-
-              <label class="check-card" for="includeSymbols">
-                <input type="checkbox" id="includeSymbols" checked>
-                <span>
-                  <strong>Symbols</strong>
-                  <small>!@#$</small>
-                </span>
-              </label>
+              <button id="togglePassword" class="btn btn-secondary" type="button">
+                Show
+              </button>
             </div>
-          </fieldset>
-        </section>
+          </section>
+
+          <section class="options" aria-labelledby="options-title">
+            <div class="section-heading compact">
+              <div>
+                <h3 id="options-title">Options</h3>
+                <!-- <p>Saved locally for 60 days. Passwords are never saved.</p> -->
+              </div>
+            </div>
+
+            <div class="length-control">
+              <label for="length">Password length</label>
+              <input
+                type="number"
+                id="length"
+                value="12"
+                min="1"
+                max="128"
+                inputmode="numeric"
+                aria-label="Set password length"
+              >
+            </div>
+
+            <fieldset class="character-options">
+              <legend>Character types</legend>
+
+              <div class="option-grid">
+                <label class="check-card" for="includeLowercase">
+                  <input type="checkbox" id="includeLowercase" checked>
+                  <span>
+                    <strong>Lowercase</strong>
+                    <small>a-z</small>
+                  </span>
+                </label>
+
+                <label class="check-card" for="includeUppercase">
+                  <input type="checkbox" id="includeUppercase" checked>
+                  <span>
+                    <strong>Uppercase</strong>
+                    <small>A-Z</small>
+                  </span>
+                </label>
+
+                <label class="check-card" for="includeNumbers">
+                  <input type="checkbox" id="includeNumbers" checked>
+                  <span>
+                    <strong>Numbers</strong>
+                    <small>0-9</small>
+                  </span>
+                </label>
+
+                <label class="check-card" for="includeSymbols">
+                  <input type="checkbox" id="includeSymbols" checked>
+                  <span>
+                    <strong>Symbols</strong>
+                    <small>!@#$</small>
+                  </span>
+                </label>
+              </div>
+            </fieldset>
+          </section>
+        </div>
       </section>
 
       <section id="analysePanel" class="tool-panel" aria-labelledby="analyse-title" hidden>
@@ -147,36 +149,48 @@
           </div>
         </div>
 
-        <section class="password-panel" aria-label="Password analyser">
-          <label class="section-label" for="analysisPassword">Password to analyse</label>
+        <div class="tool-grid analyse-grid">
+          <section class="password-panel" aria-label="Password analyser">
+            <label class="section-label" for="analysisPassword">Password to analyse</label>
 
-          <div class="password-output">
-            <input
-              type="password"
-              id="analysisPassword"
-              class="password"
-              aria-label="Password to analyse"
-              spellcheck="false"
-              autocomplete="off"
-              autocapitalize="off"
-              placeholder="Paste or type a password"
-            >
-          </div>
+            <div class="password-output">
+              <input
+                type="password"
+                id="analysisPassword"
+                class="password"
+                aria-label="Password to analyse"
+                spellcheck="false"
+                autocomplete="off"
+                autocapitalize="off"
+                placeholder="Paste or type a password"
+              >
+            </div>
 
-          <div class="password-buttons" aria-label="Analysis password actions">
-            <button id="toggleAnalysisPassword" class="btn btn-secondary" type="button">
-              Show
-            </button>
+            <div class="password-buttons" aria-label="Analysis password actions">
+              <button id="toggleAnalysisPassword" class="btn btn-secondary" type="button">
+                Show
+              </button>
 
-            <button id="clearAnalysisPassword" class="btn btn-danger" type="button">
-              Clear
-            </button>
-          </div>
+              <button id="clearAnalysisPassword" class="btn btn-danger" type="button">
+                Clear
+              </button>
+            </div>
 
-          <p class="privacy-note">
-            Analysis is performed locally. The pasted password is not saved to browser storage.
-          </p>
-        </section>
+            <p class="privacy-note">
+              Analysis is performed locally. The pasted password is not saved to browser storage.
+            </p>
+          </section>
+
+          <aside class="analysis-info-card">
+            <h3>Analysis notes</h3>
+            <p>
+              Estimated entropy is based on detected character types and simple pattern checks (not the original generation method).
+            </p>
+            <p>
+              Treat it as guidance, not a guarantee of real-world password strength.
+            </p>
+          </aside>
+        </div>
       </section>
 
       <div id="loading-container" class="loading-container" aria-live="polite">
