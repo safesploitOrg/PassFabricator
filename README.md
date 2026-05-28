@@ -20,6 +20,10 @@
 -   **Responsive Design**: Fully functional on both desktop and mobile devices.
 -   **Modular Architecture**: Clean separation of concerns with ES6 modules for maintainability and testing.
 
+## Demo
+
+![PassFabricator Demo - Password Generator](https://raw.githubusercontent.com/safesploitOrg/assets/main/repo/PassFabricator/media/PassFabricator-demo-password-generator-2160.gif)
+
 ## Why Use PassFabricator?
 
 PassFabricator helps users create secure passwords quickly and easily, ensuring strong, unpredictable passwords that enhance online security. Whether for personal use or integrating into security practices, this tool ensures that your passwords are up to modern standards of cryptographic randomness.
