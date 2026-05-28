@@ -89,6 +89,12 @@ function getSecureRandomIndex(maxExclusive) {
     throw new Error('maxExclusive must be a positive integer.');
   }
 
+  const cryptoProvider = globalThis.crypto;
+
+  if (!cryptoProvider || typeof cryptoProvider.getRandomValues !== 'function') {
+    throw new Error('Web Crypto API is not available.');
+  }
+
   const randomValues = new Uint32Array(1);
   const maxUint32 = 0x100000000;
   const limit = Math.floor(maxUint32 / maxExclusive) * maxExclusive;
@@ -96,7 +102,7 @@ function getSecureRandomIndex(maxExclusive) {
   let randomValue;
 
   do {
-    window.crypto.getRandomValues(randomValues);
+    cryptoProvider.getRandomValues(randomValues);
     randomValue = randomValues[0];
   } while (randomValue >= limit);
 
