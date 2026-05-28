@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import {
   analysePassword
-} from '../assets/js/modules/analyse_password.js';
+} from '../public/assets/js/modules/analyse_password.js';
 
 describe('analyse_password', () => {
   test('returns empty analysis for an empty password', () => {

@@ -4,7 +4,7 @@ import {
   clearPreferences,
   loadPreferences,
   savePreferences
-} from '../assets/js/modules/storage.js';
+} from '../public/assets/js/modules/storage.js';
 
 function createLocalStorageMock() {
   let store = {};

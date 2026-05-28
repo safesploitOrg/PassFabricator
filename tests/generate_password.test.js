@@ -5,7 +5,7 @@ import {
   calculateGeneratedPasswordEntropy,
   validatePasswordOptions,
   buildCharacterSet
-} from '../assets/js/modules/generate_password.js';
+} from '../public/assets/js/modules/generate_password.js';
 
 describe('generate_password', () => {
   test('validates that at least one character type is selected', () => {
