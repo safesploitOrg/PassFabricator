@@ -1,2 +1,11 @@
-# 
+# OS generated files
 .DS_Store
+
+# Ignore node_modules and build artifacts
+node_modules/
+dist/
+build/
+
+# Ignore IDE/editor config files
+.vscode/
+.idea/

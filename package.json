@@ -1,0 +1,16 @@
+{
+  "name": "passfabricator",
+  "version": "1.0.0",
+  "description": "A client-side password generator and password strength analyser.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^3.2.0",
+    "vitest": "^3.2.0"
+  }
+}
