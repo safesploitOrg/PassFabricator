@@ -10,13 +10,21 @@
 const STORAGE_KEY = 'passfabricator-preferences';
 const STORAGE_TTL_DAYS = 60;
 const STORAGE_TTL_MS = STORAGE_TTL_DAYS * 24 * 60 * 60 * 1000;
+const MAX_PASSPHRASE_DELIMITER_LENGTH = 8;
+const GENERATOR_TYPES = new Set(['random', 'memorable']);
+const PASSPHRASE_CASE_MODES = new Set(['lowercase', 'uppercase', 'capitalise']);
 
 const DEFAULT_PREFERENCES = {
-  length: 12,
+  generatorType: 'random',
+  length: 20,
   includeLowercase: true,
   includeUppercase: true,
   includeNumbers: true,
-  includeSymbols: true
+  includeSymbols: true,
+  passphraseWordCount: 4,
+  passphraseDelimiter: '-',
+  passphraseCase: 'lowercase',
+  passphraseUseNumbers: false
 };
 
 export function savePreferences(preferences) {
@@ -85,6 +93,7 @@ function isExpired(preferences) {
 
 function sanitisePreferences(preferences) {
   return {
+    generatorType: sanitiseGeneratorType(preferences?.generatorType),
     length: sanitiseLength(preferences?.length),
     includeLowercase: sanitiseBoolean(
       preferences?.includeLowercase,
@@ -101,8 +110,19 @@ function sanitisePreferences(preferences) {
     includeSymbols: sanitiseBoolean(
       preferences?.includeSymbols,
       DEFAULT_PREFERENCES.includeSymbols
+    ),
+    passphraseWordCount: sanitisePassphraseWordCount(preferences?.passphraseWordCount),
+    passphraseDelimiter: sanitisePassphraseDelimiter(preferences?.passphraseDelimiter),
+    passphraseCase: sanitisePassphraseCase(preferences?.passphraseCase),
+    passphraseUseNumbers: sanitiseBoolean(
+      preferences?.passphraseUseNumbers,
+      DEFAULT_PREFERENCES.passphraseUseNumbers
     )
   };
+}
+
+function sanitiseGeneratorType(generatorType) {
+  return GENERATOR_TYPES.has(generatorType) ? generatorType : DEFAULT_PREFERENCES.generatorType;
 }
 
 function sanitiseLength(length) {
@@ -113,6 +133,28 @@ function sanitiseLength(length) {
   }
 
   return Math.min(Math.max(parsedLength, 1), 128);
+}
+
+function sanitisePassphraseWordCount(wordCount) {
+  const parsedWordCount = Number.parseInt(wordCount, 10);
+
+  if (!Number.isInteger(parsedWordCount)) {
+    return DEFAULT_PREFERENCES.passphraseWordCount;
+  }
+
+  return Math.min(Math.max(parsedWordCount, 1), 20);
+}
+
+function sanitisePassphraseDelimiter(delimiter) {
+  if (typeof delimiter !== 'string') {
+    return DEFAULT_PREFERENCES.passphraseDelimiter;
+  }
+
+  return delimiter.replace(/[\r\n\t]/g, '').slice(0, MAX_PASSPHRASE_DELIMITER_LENGTH);
+}
+
+function sanitisePassphraseCase(caseMode) {
+  return PASSPHRASE_CASE_MODES.has(caseMode) ? caseMode : DEFAULT_PREFERENCES.passphraseCase;
 }
 
 function sanitiseBoolean(value, fallback) {

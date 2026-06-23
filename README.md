@@ -1,12 +1,13 @@
 
 # PassFabricator
 
-**PassFabricator** is a lightweight, client-side password utility built with HTML, CSS, and JavaScript. This tool allows users to generate secure, random passwords based on customizable criteria, and analyze the strength of existing passwords. All functionality runs locally in your browser with no backend required.
+**PassFabricator** is a lightweight, client-side password utility built with HTML, CSS, and JavaScript. This tool allows users to generate secure random passwords or memorable passphrases based on customizable criteria, and analyze the strength of existing passwords. All functionality runs locally in your browser with no backend required.
 
 ## Features:
 
 ### Generate
--   **Customizable Password Options**: Choose the length (from 4 to 32 characters) and character types (lowercase, uppercase, numbers, and symbols).
+-   **Random Passwords**: Choose the length and character types (lowercase, uppercase, numbers, and symbols).
+-   **Memorable Passphrases**: Generate word-based passphrases from the included EFF wordlist with configurable word count, delimiter, case, and optional number substitution.
 -   **Password Strength Meter**: Visual feedback on the strength of the generated password based on length and character variety.
 -   **Entropy Calculation**: Displays the entropy (in bits) of the generated password, providing insight into the randomness and security of the password.
 -   **Clipboard Functionality**: Easily copy the generated password to your clipboard for secure use.

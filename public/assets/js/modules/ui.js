@@ -1,13 +1,23 @@
 export const GENERATOR_DEFAULTS = {
+  generatorType: 'random',
   length: 20,
   includeLowercase: true,
   includeUppercase: true,
   includeNumbers: true,
-  includeSymbols: true
+  includeSymbols: true,
+  passphraseWordCount: 4,
+  passphraseDelimiter: '-',
+  passphraseCase: 'lowercase',
+  passphraseUseNumbers: false
 };
 
 const MIN_PASSWORD_LENGTH = 1;
 const MAX_PASSWORD_LENGTH = 128;
+const MIN_PASSPHRASE_WORDS = 1;
+const MAX_PASSPHRASE_WORDS = 20;
+const MAX_PASSPHRASE_DELIMITER_LENGTH = 8;
+const GENERATOR_TYPES = new Set(['random', 'memorable']);
+const PASSPHRASE_CASE_MODES = new Set(['lowercase', 'uppercase', 'capitalise']);
 
 export function setCurrentYear() {
   const currentYearElement = getElement('currentYear');
@@ -41,12 +51,51 @@ export function normaliseLengthInput() {
   }
 }
 
+export function getPassphraseWordCountFromDom() {
+  const wordCountInput = getElement('passphraseWordCount');
+
+  if (!wordCountInput) {
+    return GENERATOR_DEFAULTS.passphraseWordCount;
+  }
+
+  const parsedWordCount = Number.parseInt(wordCountInput.value, 10);
+
+  if (!Number.isInteger(parsedWordCount)) {
+    return GENERATOR_DEFAULTS.passphraseWordCount;
+  }
+
+  return clamp(parsedWordCount, MIN_PASSPHRASE_WORDS, MAX_PASSPHRASE_WORDS);
+}
+
+export function normalisePassphraseWordCountInput() {
+  const wordCountInput = getElement('passphraseWordCount');
+
+  if (wordCountInput) {
+    wordCountInput.value = getPassphraseWordCountFromDom();
+  }
+}
+
+export function getGeneratorTypeFromDom() {
+  const memorableTab = getElement('memorableGeneratorTab');
+
+  if (memorableTab?.getAttribute('aria-pressed') === 'true') {
+    return 'memorable';
+  }
+
+  return GENERATOR_DEFAULTS.generatorType;
+}
+
 export function getGeneratorOptionsFromDom() {
   return {
+    generatorType: getGeneratorTypeFromDom(),
     includeLowercase: getCheckboxValue('includeLowercase', true),
     includeUppercase: getCheckboxValue('includeUppercase', true),
     includeNumbers: getCheckboxValue('includeNumbers', true),
-    includeSymbols: getCheckboxValue('includeSymbols', true)
+    includeSymbols: getCheckboxValue('includeSymbols', true),
+    passphraseWordCount: getPassphraseWordCountFromDom(),
+    passphraseDelimiter: getPassphraseDelimiterFromDom(),
+    passphraseCase: getPassphraseCaseFromDom(),
+    passphraseUseNumbers: getCheckboxValue('passphraseUseNumbers', false)
   };
 }
 
@@ -55,6 +104,8 @@ export function applyGeneratorOptionsToDom(options) {
     ...GENERATOR_DEFAULTS,
     ...options
   };
+
+  setGeneratorType(normaliseGeneratorType(safeOptions.generatorType));
 
   setInputValue('length', clamp(
     Number.parseInt(safeOptions.length, 10) || GENERATOR_DEFAULTS.length,
@@ -66,6 +117,22 @@ export function applyGeneratorOptionsToDom(options) {
   setCheckboxValue('includeUppercase', safeOptions.includeUppercase);
   setCheckboxValue('includeNumbers', safeOptions.includeNumbers);
   setCheckboxValue('includeSymbols', safeOptions.includeSymbols);
+  setInputValue('passphraseWordCount', clamp(
+    Number.parseInt(safeOptions.passphraseWordCount, 10) ||
+      GENERATOR_DEFAULTS.passphraseWordCount,
+    MIN_PASSPHRASE_WORDS,
+    MAX_PASSPHRASE_WORDS
+  ));
+  setInputValue(
+    'passphraseDelimiter',
+    normalisePassphraseDelimiter(safeOptions.passphraseDelimiter)
+  );
+  setRadioValue(
+    'passphraseCase',
+    normalisePassphraseCase(safeOptions.passphraseCase),
+    GENERATOR_DEFAULTS.passphraseCase
+  );
+  setCheckboxValue('passphraseUseNumbers', safeOptions.passphraseUseNumbers);
 }
 
 export function displayGeneratedPassword(password) {
@@ -126,6 +193,21 @@ export function setAppMode(mode) {
 
   setActiveClass('generateModeButton', isGenerateMode);
   setActiveClass('analyseModeButton', isAnalyseMode);
+}
+
+export function setGeneratorType(type) {
+  const safeType = normaliseGeneratorType(type);
+  const isRandomGenerator = safeType === 'random';
+  const isMemorableGenerator = safeType === 'memorable';
+
+  setHidden('randomGeneratorOptions', !isRandomGenerator);
+  setHidden('memorableGeneratorOptions', !isMemorableGenerator);
+
+  setPressedState('randomGeneratorTab', isRandomGenerator);
+  setPressedState('memorableGeneratorTab', isMemorableGenerator);
+
+  setActiveClass('randomGeneratorTab', isRandomGenerator);
+  setActiveClass('memorableGeneratorTab', isMemorableGenerator);
 }
 
 export function showLoadingSpinner() {
@@ -276,11 +358,38 @@ function getCheckboxValue(id, fallback) {
   return checkbox.checked;
 }
 
+function getPassphraseDelimiterFromDom() {
+  const delimiterInput = getElement('passphraseDelimiter');
+
+  if (!delimiterInput) {
+    return GENERATOR_DEFAULTS.passphraseDelimiter;
+  }
+
+  return normalisePassphraseDelimiter(delimiterInput.value);
+}
+
+function getPassphraseCaseFromDom() {
+  const selectedCase = document.querySelector('input[name="passphraseCase"]:checked');
+
+  return normalisePassphraseCase(selectedCase?.value);
+}
+
 function setCheckboxValue(id, value) {
   const checkbox = getElement(id);
 
   if (checkbox) {
     checkbox.checked = Boolean(value);
+  }
+}
+
+function setRadioValue(name, value, fallback) {
+  const selectedRadio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+  const fallbackRadio = document.querySelector(`input[name="${name}"][value="${fallback}"]`);
+
+  if (selectedRadio) {
+    selectedRadio.checked = true;
+  } else if (fallbackRadio) {
+    fallbackRadio.checked = true;
   }
 }
 
@@ -322,6 +431,22 @@ function bindEvent(id, eventName, handler) {
   if (element) {
     element.addEventListener(eventName, handler);
   }
+}
+
+function normaliseGeneratorType(type) {
+  return GENERATOR_TYPES.has(type) ? type : GENERATOR_DEFAULTS.generatorType;
+}
+
+function normalisePassphraseDelimiter(delimiter) {
+  if (typeof delimiter !== 'string') {
+    return GENERATOR_DEFAULTS.passphraseDelimiter;
+  }
+
+  return delimiter.replace(/[\r\n\t]/g, '').slice(0, MAX_PASSPHRASE_DELIMITER_LENGTH);
+}
+
+function normalisePassphraseCase(caseMode) {
+  return PASSPHRASE_CASE_MODES.has(caseMode) ? caseMode : GENERATOR_DEFAULTS.passphraseCase;
 }
 
 function clamp(value, minimum, maximum) {

@@ -1,7 +1,10 @@
 import {
   generatePassword,
   calculateGeneratedPasswordEntropy,
-  validatePasswordOptions
+  validatePasswordOptions,
+  parseWordList,
+  generatePassphrase,
+  calculatePassphraseEntropy
 } from './modules/generate_password.js';
 
 import {
@@ -18,12 +21,15 @@ import {
   setCurrentYear,
   getPasswordLengthFromDom,
   normaliseLengthInput,
+  normalisePassphraseWordCountInput,
+  getGeneratorTypeFromDom,
   getGeneratorOptionsFromDom,
   applyGeneratorOptionsToDom,
   displayGeneratedPassword,
   updateMetricsDisplay,
   updateFeedbackDisplay,
   setAppMode,
+  setGeneratorType,
   showLoadingSpinner,
   hideLoadingSpinner,
   copyGeneratedPasswordToClipboard,
@@ -38,6 +44,7 @@ import {
 } from './modules/ui.js';
 
 const DEFAULT_APP_MODE = 'generate';
+const PASSPHRASE_WORDLIST_URL = 'assets/wordlist/eff_large_wordlist.txt';
 
 const HASH_TO_MODE = {
   '#generate': 'generate',
@@ -57,6 +64,14 @@ const CHECKBOX_IDS = [
   'includeNumbers',
   'includeSymbols'
 ];
+
+const PASSPHRASE_CASE_IDS = [
+  'passphraseCaseLowercase',
+  'passphraseCaseUppercase',
+  'passphraseCaseCapitalise'
+];
+
+let passphraseWordListPromise = null;
 
 document.addEventListener('DOMContentLoaded', initialiseApp);
 
@@ -79,6 +94,10 @@ function initialiseApp() {
 
   setAppMode(initialMode);
 
+  if (getGeneratorTypeFromDom() === 'memorable') {
+    void loadPassphraseWordList().catch(() => {});
+  }
+
   if (initialMode === 'generate') {
     generateAndDisplayPassword();
   } else {
@@ -87,6 +106,15 @@ function initialiseApp() {
 }
 
 function bindGeneratorEvents() {
+  bindClickEvent('randomGeneratorTab', () => {
+    selectGeneratorType('random');
+  });
+
+  bindClickEvent('memorableGeneratorTab', () => {
+    void loadPassphraseWordList().catch(() => {});
+    selectGeneratorType('memorable');
+  });
+
   bindInputEvent('length', () => {
     normaliseLengthInput();
     persistCurrentGeneratorPreferences();
@@ -98,6 +126,29 @@ function bindGeneratorEvents() {
       persistCurrentGeneratorPreferences();
       generateAndDisplayPassword();
     });
+  });
+
+  bindInputEvent('passphraseWordCount', () => {
+    normalisePassphraseWordCountInput();
+    persistCurrentGeneratorPreferences();
+    generateAndDisplayPassword();
+  });
+
+  bindInputEvent('passphraseDelimiter', () => {
+    persistCurrentGeneratorPreferences();
+    generateAndDisplayPassword();
+  });
+
+  PASSPHRASE_CASE_IDS.forEach((id) => {
+    bindChangeEvent(id, () => {
+      persistCurrentGeneratorPreferences();
+      generateAndDisplayPassword();
+    });
+  });
+
+  bindChangeEvent('passphraseUseNumbers', () => {
+    persistCurrentGeneratorPreferences();
+    generateAndDisplayPassword();
   });
 
   bindClickEvent('copy', async () => {
@@ -146,16 +197,50 @@ function persistCurrentGeneratorPreferences() {
   savePreferences(preferences);
 }
 
+function selectGeneratorType(generatorType) {
+  setGeneratorType(generatorType);
+  persistCurrentGeneratorPreferences();
+  generateAndDisplayPassword();
+}
+
 function generateAndDisplayPassword() {
   normaliseLengthInput();
+  normalisePassphraseWordCountInput();
 
   const length = getPasswordLengthFromDom();
   const options = getGeneratorOptionsFromDom();
 
   showLoadingSpinner();
 
-  window.setTimeout(() => {
+  window.setTimeout(async () => {
     try {
+      if (options.generatorType === 'memorable') {
+        const wordList = await loadPassphraseWordList();
+        const password = generatePassphrase(wordList, {
+          wordCount: options.passphraseWordCount,
+          delimiter: options.passphraseDelimiter,
+          caseMode: options.passphraseCase,
+          substituteNumbers: options.passphraseUseNumbers
+        });
+        const entropyBits = calculatePassphraseEntropy(
+          options.passphraseWordCount,
+          wordList.length
+        );
+        const analysis = analysePassword(password);
+
+        displayGeneratedPassword(password);
+
+        updateMetricsDisplay({
+          password,
+          strengthScore: analysis.strengthScore,
+          entropyBits,
+          entropyLabel: 'Entropy'
+        });
+
+        updateFeedbackDisplay([]);
+        return;
+      }
+
       if (!validatePasswordOptions(options)) {
         alert('You must select at least one character type!');
         return;
@@ -175,6 +260,11 @@ function generateAndDisplayPassword() {
       });
 
       updateFeedbackDisplay([]);
+    } catch (error) {
+      console.error('Unable to generate password:', error);
+      updateFeedbackDisplay([
+        'Unable to generate a password. Check that the passphrase wordlist can be loaded.'
+      ]);
     } finally {
       hideLoadingSpinner();
     }
@@ -219,4 +309,32 @@ function handleHashChange() {
   } else {
     analyseProvidedPassword();
   }
+}
+
+async function loadPassphraseWordList() {
+  if (!passphraseWordListPromise) {
+    passphraseWordListPromise = fetch(PASSPHRASE_WORDLIST_URL)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Wordlist request failed with status ${response.status}.`);
+        }
+
+        return response.text();
+      })
+      .then((rawWordList) => {
+        const wordList = parseWordList(rawWordList);
+
+        if (wordList.length === 0) {
+          throw new Error('Passphrase wordlist is empty.');
+        }
+
+        return wordList;
+      })
+      .catch((error) => {
+        passphraseWordListPromise = null;
+        throw error;
+      });
+  }
+
+  return passphraseWordListPromise;
 }

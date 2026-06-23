@@ -48,9 +48,29 @@
         <div class="section-heading">
           <div>
             <h2 id="generate-title">Generate password</h2>
-            <p>Create a random password using browser-native cryptographic randomness.</p>
+            <p>Create a random password or memorable passphrase using browser-native cryptographic randomness.</p>
           </div>
         </div>
+
+        <nav class="generator-switcher" aria-label="Choose generator type">
+          <button
+            id="randomGeneratorTab"
+            class="generator-tab is-active"
+            type="button"
+            aria-pressed="true"
+          >
+            Random
+          </button>
+
+          <button
+            id="memorableGeneratorTab"
+            class="generator-tab"
+            type="button"
+            aria-pressed="false"
+          >
+            Memorable
+          </button>
+        </nav>
 
         <div class="tool-grid generate-grid">
           <section class="password-panel" aria-label="Generated password">
@@ -87,56 +107,143 @@
               </div>
             </div>
 
-            <div class="length-control">
-              <label for="length">Password length</label>
-              <input
-                type="number"
-                id="length"
-                value="12"
-                min="1"
-                max="128"
-                inputmode="numeric"
-                aria-label="Set password length"
-              >
+            <div id="randomGeneratorOptions" class="generator-options-panel">
+              <div class="length-control">
+                <label for="length">Password length</label>
+                <input
+                  type="number"
+                  id="length"
+                  value="20"
+                  min="1"
+                  max="128"
+                  inputmode="numeric"
+                  aria-label="Set password length"
+                >
+              </div>
+
+              <fieldset class="character-options">
+                <legend>Character types</legend>
+
+                <div class="option-grid">
+                  <label class="check-card" for="includeLowercase">
+                    <input type="checkbox" id="includeLowercase" checked>
+                    <span>
+                      <strong>Lowercase</strong>
+                      <small>a-z</small>
+                    </span>
+                  </label>
+
+                  <label class="check-card" for="includeUppercase">
+                    <input type="checkbox" id="includeUppercase" checked>
+                    <span>
+                      <strong>Uppercase</strong>
+                      <small>A-Z</small>
+                    </span>
+                  </label>
+
+                  <label class="check-card" for="includeNumbers">
+                    <input type="checkbox" id="includeNumbers" checked>
+                    <span>
+                      <strong>Numbers</strong>
+                      <small>0-9</small>
+                    </span>
+                  </label>
+
+                  <label class="check-card" for="includeSymbols">
+                    <input type="checkbox" id="includeSymbols" checked>
+                    <span>
+                      <strong>Symbols</strong>
+                      <small>!@#$</small>
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
             </div>
 
-            <fieldset class="character-options">
-              <legend>Character types</legend>
+            <div id="memorableGeneratorOptions" class="generator-options-panel" hidden>
+              <div class="passphrase-controls">
+                <div class="length-control">
+                  <label for="passphraseWordCount">Words</label>
+                  <input
+                    type="number"
+                    id="passphraseWordCount"
+                    value="4"
+                    min="1"
+                    max="20"
+                    inputmode="numeric"
+                    aria-label="Set passphrase word count"
+                  >
+                </div>
 
-              <div class="option-grid">
-                <label class="check-card" for="includeLowercase">
-                  <input type="checkbox" id="includeLowercase" checked>
-                  <span>
-                    <strong>Lowercase</strong>
-                    <small>a-z</small>
-                  </span>
-                </label>
-
-                <label class="check-card" for="includeUppercase">
-                  <input type="checkbox" id="includeUppercase" checked>
-                  <span>
-                    <strong>Uppercase</strong>
-                    <small>A-Z</small>
-                  </span>
-                </label>
-
-                <label class="check-card" for="includeNumbers">
-                  <input type="checkbox" id="includeNumbers" checked>
-                  <span>
-                    <strong>Numbers</strong>
-                    <small>0-9</small>
-                  </span>
-                </label>
-
-                <label class="check-card" for="includeSymbols">
-                  <input type="checkbox" id="includeSymbols" checked>
-                  <span>
-                    <strong>Symbols</strong>
-                    <small>!@#$</small>
-                  </span>
-                </label>
+                <div class="length-control">
+                  <label for="passphraseDelimiter">Delimiter</label>
+                  <input
+                    type="text"
+                    id="passphraseDelimiter"
+                    value="-"
+                    maxlength="8"
+                    spellcheck="false"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    aria-label="Set passphrase delimiter"
+                  >
+                </div>
               </div>
-            </fieldset>
+
+              <fieldset class="character-options">
+                <legend>Case</legend>
+
+                <div class="option-grid">
+                  <label class="check-card" for="passphraseCaseLowercase">
+                    <input
+                      type="radio"
+                      id="passphraseCaseLowercase"
+                      name="passphraseCase"
+                      value="lowercase"
+                      checked
+                    >
+                    <span>
+                      <strong>Lowercase</strong>
+                      <small>word</small>
+                    </span>
+                  </label>
+
+                  <label class="check-card" for="passphraseCaseUppercase">
+                    <input
+                      type="radio"
+                      id="passphraseCaseUppercase"
+                      name="passphraseCase"
+                      value="uppercase"
+                    >
+                    <span>
+                      <strong>Uppercase</strong>
+                      <small>WORD</small>
+                    </span>
+                  </label>
+
+                  <label class="check-card" for="passphraseCaseCapitalise">
+                    <input
+                      type="radio"
+                      id="passphraseCaseCapitalise"
+                      name="passphraseCase"
+                      value="capitalise"
+                    >
+                    <span>
+                      <strong>Capitalise</strong>
+                      <small>Word</small>
+                    </span>
+                  </label>
+
+                  <label class="check-card" for="passphraseUseNumbers">
+                    <input type="checkbox" id="passphraseUseNumbers">
+                    <span>
+                      <strong>Numbered</strong>
+                      <small>i/o to 1/0</small>
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+            </div>
           </section>
         </div>
       </section>

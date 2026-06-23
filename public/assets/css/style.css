@@ -164,6 +164,46 @@ h1 {
   transform: translateY(1px);
 }
 
+.generator-switcher {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+  padding: 0.35rem;
+  margin-bottom: 1rem;
+  background: #f1f5f9;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.generator-tab {
+  min-height: 2.65rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: #475569;
+  cursor: pointer;
+  font-weight: 900;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.generator-tab:hover {
+  color: var(--text);
+}
+
+.generator-tab.is-active {
+  background: #fff;
+  color: var(--primary);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
+}
+
+.generator-tab:active {
+  transform: translateY(1px);
+}
+
 .tool-panel {
   width: 100%;
 }
@@ -299,8 +339,9 @@ legend {
 
 .btn:focus-visible,
 .mode-button:focus-visible,
+.generator-tab:focus-visible,
 .check-card:has(input:focus-visible),
-input[type="number"]:focus-visible,
+.length-control input:focus-visible,
 .password:focus-visible {
   outline: 3px solid rgba(56, 189, 248, 0.45);
   outline-offset: 3px;
@@ -351,7 +392,8 @@ input[type="number"]:focus-visible,
   border-radius: var(--radius-md);
 }
 
-input[type="number"] {
+.length-control input[type="number"],
+.length-control input[type="text"] {
   width: 6rem;
   min-height: 2.75rem;
   border: 1px solid var(--border);
@@ -360,6 +402,16 @@ input[type="number"] {
   color: var(--text);
   font-weight: 900;
   text-align: center;
+}
+
+.generator-options-panel[hidden] {
+  display: none;
+}
+
+.passphrase-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
 }
 
 .character-options {
@@ -750,6 +802,7 @@ footer a:hover {
 
   .password-buttons,
   .option-grid,
+  .passphrase-controls,
   .strength-entropy {
     grid-template-columns: 1fr;
   }
@@ -759,7 +812,8 @@ footer a:hover {
     gap: 0.65rem;
   }
 
-  input[type="number"] {
+  .length-control input[type="number"],
+  .length-control input[type="text"] {
     width: 100%;
   }
 }

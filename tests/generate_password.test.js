@@ -1,13 +1,28 @@
-import { describe, expect, test } from 'vitest';
+import { webcrypto } from 'node:crypto';
+
+import { beforeAll, describe, expect, test } from 'vitest';
 
 import {
   generatePassword,
   calculateGeneratedPasswordEntropy,
+  calculatePassphraseEntropy,
   validatePasswordOptions,
-  buildCharacterSet
+  buildCharacterSet,
+  parseWordList,
+  generatePassphrase,
+  formatPassphraseWord
 } from '../public/assets/js/modules/generate_password.js';
 
 describe('generate_password', () => {
+  beforeAll(() => {
+    if (!globalThis.crypto) {
+      Object.defineProperty(globalThis, 'crypto', {
+        value: webcrypto,
+        configurable: true
+      });
+    }
+  });
+
   test('validates that at least one character type is selected', () => {
     expect(validatePasswordOptions({
       includeLowercase: false,
@@ -91,5 +106,70 @@ describe('generate_password', () => {
     });
 
     expect(entropy).toBe(Math.round(10 * Math.log2(26)));
+  });
+
+  test('parses EFF-style wordlists', () => {
+    const wordList = parseWordList(`
+      11111 abacus
+      11112 abdomen
+      11113 abdominal
+    `);
+
+    expect(wordList).toEqual(['abacus', 'abdomen', 'abdominal']);
+  });
+
+  test('generates passphrases using the requested word count and delimiter', () => {
+    const passphrase = generatePassphrase(['afflicted'], {
+      wordCount: 3,
+      delimiter: '-',
+      caseMode: 'lowercase',
+      substituteNumbers: false
+    });
+
+    expect(passphrase).toBe('afflicted-afflicted-afflicted');
+  });
+
+  test('formats passphrase words with optional case and number substitutions', () => {
+    expect(formatPassphraseWord('afflicted', {
+      caseMode: 'uppercase',
+      substituteNumbers: false
+    })).toBe('AFFLICTED');
+
+    expect(formatPassphraseWord('afflicted', {
+      caseMode: 'capitalise',
+      substituteNumbers: false
+    })).toBe('Afflicted');
+
+    expect(formatPassphraseWord('afflicted', {
+      caseMode: 'lowercase',
+      substituteNumbers: true
+    })).toBe('affl1cted');
+
+    expect(formatPassphraseWord('door', {
+      caseMode: 'lowercase',
+      substituteNumbers: true
+    })).toBe('d00r');
+  });
+
+  test('returns an empty passphrase when memorable options are invalid', () => {
+    expect(generatePassphrase(['afflicted'], {
+      wordCount: 0,
+      delimiter: '-',
+      caseMode: 'lowercase',
+      substituteNumbers: false
+    })).toBe('');
+
+    expect(generatePassphrase([], {
+      wordCount: 3,
+      delimiter: '-',
+      caseMode: 'lowercase',
+      substituteNumbers: false
+    })).toBe('');
+  });
+
+  test('calculates passphrase entropy from word count and wordlist size', () => {
+    const entropy = calculatePassphraseEntropy(4, 7776);
+
+    expect(entropy).toBe(Math.round(4 * Math.log2(7776)));
   });
 });

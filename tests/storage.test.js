@@ -33,11 +33,16 @@ describe('storage', () => {
 
   test('saves and loads preferences', () => {
     const preferences = {
+      generatorType: 'memorable',
       length: 32,
       includeLowercase: true,
       includeUppercase: true,
       includeNumbers: true,
-      includeSymbols: false
+      includeSymbols: false,
+      passphraseWordCount: 5,
+      passphraseDelimiter: '.',
+      passphraseCase: 'capitalise',
+      passphraseUseNumbers: true
     };
 
     expect(savePreferences(preferences)).toBe(true);
@@ -56,6 +61,31 @@ describe('storage', () => {
     const preferences = loadPreferences();
 
     expect(preferences.length).toBe(128);
+  });
+
+  test('sanitises invalid memorable preferences when saving', () => {
+    savePreferences({
+      generatorType: 'unknown',
+      length: 32,
+      includeLowercase: true,
+      includeUppercase: true,
+      includeNumbers: true,
+      includeSymbols: true,
+      passphraseWordCount: 999,
+      passphraseDelimiter: '123456789',
+      passphraseCase: 'title',
+      passphraseUseNumbers: 'yes'
+    });
+
+    const preferences = loadPreferences();
+
+    expect(preferences).toMatchObject({
+      generatorType: 'random',
+      passphraseWordCount: 20,
+      passphraseDelimiter: '12345678',
+      passphraseCase: 'lowercase',
+      passphraseUseNumbers: false
+    });
   });
 
   test('returns null when no preferences exist', () => {
