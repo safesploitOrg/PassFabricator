@@ -1,10 +1,8 @@
 import {
   generatePassword,
-  calculateGeneratedPasswordEntropy,
   validatePasswordOptions,
   parseWordList,
-  generatePassphrase,
-  calculatePassphraseEntropy
+  generatePassphrase
 } from './modules/generate_password.js';
 
 import {
@@ -222,19 +220,20 @@ function generateAndDisplayPassword() {
           caseMode: options.passphraseCase,
           substituteNumbers: options.passphraseUseNumbers
         });
-        const entropyBits = calculatePassphraseEntropy(
-          options.passphraseWordCount,
-          wordList.length
-        );
         const analysis = analysePassword(password);
 
         displayGeneratedPassword(password);
 
+        // A pending generation must not overwrite the active Analyse result.
+        if (getModeFromHash() !== 'generate') {
+          return;
+        }
+
         updateMetricsDisplay({
           password,
           strengthScore: analysis.strengthScore,
-          entropyBits,
-          entropyLabel: 'Entropy'
+          entropyBits: analysis.entropyBits,
+          entropyLabel: 'Estimated entropy'
         });
 
         updateFeedbackDisplay([]);
@@ -247,24 +246,29 @@ function generateAndDisplayPassword() {
       }
 
       const password = generatePassword(length, options);
-      const entropyBits = calculateGeneratedPasswordEntropy(password, options);
       const analysis = analysePassword(password);
 
       displayGeneratedPassword(password);
 
+      if (getModeFromHash() !== 'generate') {
+        return;
+      }
+
       updateMetricsDisplay({
         password,
         strengthScore: analysis.strengthScore,
-        entropyBits,
-        entropyLabel: 'Entropy'
+        entropyBits: analysis.entropyBits,
+        entropyLabel: 'Estimated entropy'
       });
 
       updateFeedbackDisplay([]);
     } catch (error) {
       console.error('Unable to generate password:', error);
-      updateFeedbackDisplay([
-        'Unable to generate a password. Check that the passphrase wordlist can be loaded.'
-      ]);
+      if (getModeFromHash() === 'generate') {
+        updateFeedbackDisplay([
+          'Unable to generate a password. Check that the passphrase wordlist can be loaded.'
+        ]);
+      }
     } finally {
       hideLoadingSpinner();
     }
