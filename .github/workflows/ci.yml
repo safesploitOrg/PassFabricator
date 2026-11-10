@@ -2,36 +2,154 @@ name: CI
 
 on:
   push:
-    branches:
+    branches: 
       - main
+      - staging
   pull_request:
+  workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
 
 jobs:
-  test:
-    name: Unit tests
+  quality:
+    name: Source quality
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version:
-          - 24
-          - 26
-
+    timeout-minutes: 10
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: ${{ matrix.node-version }}
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
           cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run lint
+      - run: git diff --check
 
-      - name: Install dependencies
-        run: npm ci
+  unit:
+    name: Unit and integration (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [24, 26]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run coverage
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: coverage-node-${{ matrix.node }}
+          path: coverage/
+          retention-days: 7
+          if-no-files-found: error
 
-      - name: Run unit tests
-        run: npm test
+  # browser:
+  #   name: Browser (${{ matrix.browser }})
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 20
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       browser: [chromium, firefox, webkit]
+  #   steps:
+  #     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+  #       with:
+  #         persist-credentials: false
+  #     - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+  #       with:
+  #         node-version: 24
+  #         cache: npm
+  #     - run: npm ci --ignore-scripts --no-audit --no-fund
+  #     - run: npx --no-install playwright install --with-deps "$BROWSER"
+  #       env:
+  #         BROWSER: ${{ matrix.browser }}
+  #     - run: npm run build
+  #     - run: npx --no-install playwright test --project="$BROWSER-*"
+  #       env:
+  #         BROWSER: ${{ matrix.browser }}
+  #     - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+  #       if: ${{ !cancelled() }}
+  #       with:
+  #         name: browser-${{ matrix.browser }}
+  #         path: playwright-report/
+  #         retention-days: 7
+  #         if-no-files-found: error
+
+  security:
+    name: Security gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Audit development and runtime dependency tree
+        run: npm run audit
+      - name: Install pinned SAST scanner
+        run: python -m pip install --disable-pip-version-check semgrep==1.184.0
+      - name: Install checksum-verified secret scanner
+        run: |
+          bash scripts/install-gitleaks.sh "$RUNNER_TEMP/gitleaks-bin"
+          printf '%s\n' "$RUNNER_TEMP/gitleaks-bin" >> "$GITHUB_PATH"
+      - name: Verify scanner failure behaviour
+        run: bash scripts/check-security-gates.sh
+      - name: SAST (local reviewed rules, no source upload)
+        run: npm run security:sast
+      - name: Secrets in full Git history and working tree
+        run: |
+          gitleaks git --redact --exit-code 1 .
+          npm run security:secrets
+
+  build:
+    name: Validated static artifact
+    needs: [
+      quality, 
+      unit, 
+      # browser, 
+      security
+      ]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run build
+      - name: Record development SBOM and source identity
+        run: |
+          npm sbom --sbom-format=cyclonedx > reports/development-sbom.cdx.json
+          printf '%s\n' "$GITHUB_SHA" > reports/source-commit.txt
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: build-evidence
+          path: reports/
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist/

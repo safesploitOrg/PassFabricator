@@ -9,3 +9,11 @@ build/
 # Ignore IDE/editor config files
 .vscode/
 .idea/
+
+# Local verification output (never publish passwords or browser traces)
+coverage/
+playwright-report/
+test-results/
+reports/
+.venv/
+.tools/

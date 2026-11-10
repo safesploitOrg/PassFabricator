@@ -1,0 +1,36 @@
+rules:
+  - id: password-insecure-random
+    languages: [javascript]
+    severity: ERROR
+    message: Use Web Crypto rejection sampling for password generation.
+    pattern: Math.random(...)
+  - id: dynamic-code-execution
+    languages: [javascript]
+    severity: ERROR
+    message: Do not evaluate dynamically constructed code.
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)
+      - pattern: Function(...)
+  - id: dynamic-html-insertion
+    languages: [javascript]
+    severity: ERROR
+    message: Render untrusted content using textContent or DOM nodes.
+    patterns:
+      - pattern-either:
+          - pattern: $ELEMENT.innerHTML = $VALUE
+          - pattern: $ELEMENT.outerHTML = $VALUE
+      - pattern-not: $ELEMENT.innerHTML = ''
+      - pattern-not: $ELEMENT.outerHTML = ''
+  - id: html-adjacent-insertion
+    languages: [javascript]
+    severity: ERROR
+    message: Avoid HTML string sinks in this password tool.
+    pattern-either:
+      - pattern: $ELEMENT.insertAdjacentHTML(...)
+      - pattern: document.write(...)
+  - id: password-network-body
+    languages: [javascript]
+    severity: ERROR
+    message: Passwords must stay local; do not add network request bodies.
+    pattern: 'fetch($URL, { ..., body: $BODY, ... })'

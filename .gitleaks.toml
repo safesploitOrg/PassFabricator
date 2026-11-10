@@ -1,0 +1,8 @@
+title = "PassFabricator secret scanning"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Generated reports and installed dependencies, never source or tests"
+paths = ['''(^|/)(node_modules|coverage|reports|playwright-report|test-results|\.venv|\.tools)/''']
